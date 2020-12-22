@@ -1,5 +1,5 @@
 <template lang="pug">
-div.stripe#stripe
+div(class="stripe" id="stripe" :style="gotResult ? {backgroundColor: '#343BAA'} : {backgroundColor: '#5858B9'} ")
   div(class="stripe-wellDone" v-if="gotResult")
     h1 WELL
     h1 DONE!
@@ -55,7 +55,6 @@ export default {
       const iconLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 120);
       const totalLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 200);
       const textRotateOffset = (360 / data.value.length) / 2;
-      // let rotateOffset = -30;
       let rotateOffset = -((360 / data.value.length) / 2);
 
       const g = wheel.append('g')
