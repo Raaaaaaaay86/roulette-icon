@@ -45,6 +45,7 @@ export default {
       },
     ]);
     const gotResult = ref(false);
+    let isSpinng = false;
     onMounted(() => {
       const wheel = d3.select('#wheel');
       const wheelRadius = 250;
@@ -53,8 +54,8 @@ export default {
       const textLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 160);
       const iconLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 120);
       const totalLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 220);
-      let rotateOffset = -30;
       const textRotateOffset = (360 / data.value.length) / 2;
+      let rotateOffset = -30;
 
       const g = wheel.append('g')
         .attr('transform', `translate(${width / 2}, ${height / 2})`);
@@ -67,7 +68,7 @@ export default {
         .data(pie(data.value))
         .enter()
         .append('g')
-        .attr('class', 'arc');
+        .attr('class', (d) => `arc ${d.data.name}`);
 
       const offsetTheWheelRotate = () => {
         wheel.node().style.transform = `translate(-50%, -50%) rotate(${rotateOffset}deg)`;
@@ -146,6 +147,9 @@ export default {
       };
 
       const initWheel = () => {
+        // d3.elect('#wheel')
+        //   .selectAll('g')
+        //   .remove();
         offsetTheWheelRotate();
         drawPies();
         drawPrizeTitle();
@@ -165,7 +169,6 @@ export default {
         const interval = 130;
         let lasPosition = -100;
 
-        // stripe.selectAll('text').remove();
         removeAllRandomIcon();
 
         for (let i = 0; i < 30; i += 1) {
@@ -190,6 +193,14 @@ export default {
         });
       };
 
+      const activePie = (className) => {
+        const activePies = d3.selectAll(`.${className}`);
+        activePies.selectAll('path')
+          .attr('fill', '#FF00BA');
+        activePies.selectAll('text')
+          .attr('fill', '#fff');
+      };
+
       const getAngleList = () => {
         const angleList = [];
         const startAngle = -30;
@@ -206,20 +217,28 @@ export default {
       let lastPrizeIndex = null;
       const getPrize = () => {
         if (prizeTotal.value <= 0) return alert('no prize');
-        gotResult.value = false;
+        if (isSpinng) return alert('spinng');
+
         const prize = data.value[Math.floor(Math.random() * data.value.length)];
         const prizeIndex = data.value.findIndex((p) => p.name === prize.name);
         const angleList = getAngleList();
 
+        initWheel();
+        removeAllRandomIcon();
+        gotResult.value = false;
         if (prize.total === 0) return getPrize(); // 抽到已抽完的，重抽。
+        isSpinng = true;
         prize.total -= 1;
 
         setTimeout(() => {
           gotResult.value = true;
           outputPrize.value = prize;
           appendRadomIcon(prize);
-          initWheel();
-        }, 6000);
+
+          // initWheel();
+          activePie(prize.name);
+          isSpinng = false;
+        }, 3000);
 
         if (lastPrizeIndex) {
           rotateOffset -= (angleList[prizeIndex] - angleList[lastPrizeIndex]) - 3600;
@@ -318,7 +337,7 @@ html {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  transition: all 6s ease-in-out;
+  transition: all 1s ease-in-out;
 }
 
 #wheel-outside {
