@@ -26,22 +26,22 @@ export default {
     const outputPrize = ref(null);
     const data = ref([
       {
-        name: 'Movie', value: 1, icon: '\ue43a', total: 1,
+        name: 'Movie', value: 1, icon: '\ue43a', total: 5,
       },
       {
-        name: 'Wish', value: 1, icon: '\ue7e9', total: 1,
+        name: 'Wish', value: 1, icon: '\ue7e9', total: 5,
       },
       {
-        name: 'Anything', value: 1, icon: '\ue8d0', total: 1,
+        name: 'Anything', value: 1, icon: '\ue8d0', total: 5,
       },
       {
-        name: 'Child', value: 1, icon: '\ueb41', total: 1,
+        name: 'Child', value: 1, icon: '\ueb41', total: 4,
       },
       {
         name: 'Flight', value: 1, icon: '\ue539', total: 1,
       },
       {
-        name: 'Wifi', value: 1, icon: '\ue63e', total: 1,
+        name: 'Wifi', value: 1, icon: '\ue63e', total: 5,
       },
     ]);
     const gotResult = ref(false);
