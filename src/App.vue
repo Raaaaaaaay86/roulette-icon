@@ -250,7 +250,7 @@ export default {
           initWheel();
           activePie(prize.name);
           isSpinng = false;
-        }, 1000);
+        }, 10000);
 
         if (lastPrizeIndex) {
           rotateOffset -= (angleList[prizeIndex] - angleList[lastPrizeIndex]) - 3600;
@@ -349,7 +349,7 @@ html {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  transition: all 1s ease-in-out;
+  transition: all 10s ease-in-out;
 }
 
 #wheel-outside {
