@@ -42,7 +42,8 @@
     },
     "rules": {
       "no-unused-vars": "warn",
-      "prefer-const": "warn"
+      "prefer-const": "warn",
+      "max-len": "off"
     }
   },
   "browserslist": [

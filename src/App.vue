@@ -53,11 +53,13 @@ export default {
       const height = wheel.attr('height');
       const textLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 160);
       const iconLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 120);
-      const totalLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 220);
+      const totalLabel = d3.arc().outerRadius(wheelRadius).innerRadius(wheelRadius - 200);
       const textRotateOffset = (360 / data.value.length) / 2;
-      let rotateOffset = -30;
+      // let rotateOffset = -30;
+      let rotateOffset = -((360 / data.value.length) / 2);
 
       const g = wheel.append('g')
+        .attr('id', 'g-wrapper')
         .attr('transform', `translate(${width / 2}, ${height / 2})`);
       const pie = d3.pie().value((d) => d.value);
 
@@ -75,10 +77,13 @@ export default {
       };
 
       const drawPies = () => {
+        pies.selectAll('.piePath').remove();
+
         pies.append('path')
           .attr('d', arcPath)
           .attr('stroke', '#1F1579')
           .attr('stroke-width', '2px')
+          .attr('class', 'piePath')
           .attr('fill', (dataObject, index) => {
             const isEven = index % 2 === 0;
             if (isEven) return '#343BAA';
@@ -87,6 +92,8 @@ export default {
       };
 
       const drawPrizeTitle = () => {
+        pies.selectAll('.text-title').remove();
+
         pies.append('text')
           .attr('transform', (dataObject, index) => {
             const halfAngleOfEachPie = (dataObject.endAngle * 57.32) / 2; // convert radian to angle
@@ -98,6 +105,7 @@ export default {
           .attr('font-family', 'Roboto Condensed')
           .attr('font-wieght', 'bolder')
           .attr('font-size', '24')
+          .attr('class', 'text-title')
           .attr('fill', (dataObject, index) => {
             const isEven = index % 2 === 0;
             if (isEven) return '#F0BEFF';
@@ -107,6 +115,8 @@ export default {
       };
 
       const drawPrizeIcon = () => {
+        pies.selectAll('.text-icon').remove();
+
         pies.append('text')
           .attr('transform', (dataObject, index) => {
             const halfAngleOfEachPie = (dataObject.endAngle * 57.32) / 2; // convert radian to angle
@@ -118,6 +128,7 @@ export default {
           .attr('font-family', 'Material Icons')
           .attr('font-wieght', 'bolder')
           .attr('font-size', '48')
+          .attr('class', 'text-icon')
           .attr('fill', (dataObject, index) => {
             const isEven = index % 2 === 0;
             if (isEven) return '#F0BEFF';
@@ -127,6 +138,8 @@ export default {
       };
 
       const drawPrizeRemainTotal = () => {
+        pies.selectAll('.text-total').remove();
+
         pies.append('text')
           .attr('transform', (dataObject, index) => {
             const halfAngleOfEachPie = (dataObject.endAngle * 57.32) / 2; // convert radian to angle
@@ -138,6 +151,7 @@ export default {
           .attr('font-family', 'Roboto Condensed')
           .attr('font-wieght', 'bolder')
           .attr('font-size', '16')
+          .attr('class', 'text-total')
           .attr('fill', (dataObject, index) => {
             const isEven = index % 2 === 0;
             if (isEven) return '#F0BEFF';
@@ -147,14 +161,19 @@ export default {
       };
 
       const initWheel = () => {
-        // d3.elect('#wheel')
-        //   .selectAll('g')
-        //   .remove();
         offsetTheWheelRotate();
         drawPies();
         drawPrizeTitle();
         drawPrizeIcon();
         drawPrizeRemainTotal();
+      };
+
+      const activePie = (className) => {
+        const activePies = d3.selectAll(`.${className}`);
+        activePies.selectAll('path')
+          .attr('fill', '#FF00BA');
+        activePies.selectAll('text')
+          .attr('fill', '#fff');
       };
 
       const removeAllRandomIcon = () => {
@@ -193,40 +212,35 @@ export default {
         });
       };
 
-      const activePie = (className) => {
-        const activePies = d3.selectAll(`.${className}`);
-        activePies.selectAll('path')
-          .attr('fill', '#FF00BA');
-        activePies.selectAll('text')
-          .attr('fill', '#fff');
-      };
-
       const getAngleList = () => {
         const angleList = [];
-        const startAngle = -30;
+        const startAngle = -((360 / data.value.length) / 2);
+        const eachPieAngle = 360 / data.value.length;
+
         data.value.forEach((p, index) => {
-          if (startAngle + (index * 60) < 0) {
+          if (startAngle + (index * eachPieAngle) < 0) {
             angleList.push(360);
           } else {
-            angleList.push((startAngle + (index * 60) + 360 + 30));
+            angleList.push((startAngle + (index * eachPieAngle) + 360 + (-startAngle)));
           }
         });
+
         return angleList;
       };
 
       let lastPrizeIndex = null;
       const getPrize = () => {
-        if (prizeTotal.value <= 0) return alert('no prize');
-        if (isSpinng) return alert('spinng');
+        if (prizeTotal.value <= 0) return false;
+        if (isSpinng) return false;
 
         const prize = data.value[Math.floor(Math.random() * data.value.length)];
         const prizeIndex = data.value.findIndex((p) => p.name === prize.name);
         const angleList = getAngleList();
-
+        console.log(angleList);
         initWheel();
         removeAllRandomIcon();
         gotResult.value = false;
-        if (prize.total === 0) return getPrize(); // 抽到已抽完的，重抽。
+        if (prize.total === 0) return getPrize();
         isSpinng = true;
         prize.total -= 1;
 
@@ -234,11 +248,10 @@ export default {
           gotResult.value = true;
           outputPrize.value = prize;
           appendRadomIcon(prize);
-
-          // initWheel();
+          initWheel();
           activePie(prize.name);
           isSpinng = false;
-        }, 3000);
+        }, 1000);
 
         if (lastPrizeIndex) {
           rotateOffset -= (angleList[prizeIndex] - angleList[lastPrizeIndex]) - 3600;
